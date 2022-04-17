@@ -16,20 +16,21 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
     var egg1:SKSpriteNode!
     var egg2:SKSpriteNode!
     var egg3:SKSpriteNode!
-    var currentScore:SKLabelNode!
+    var ScoreLabel:SKLabelNode!
     override func didMove(to view: SKView) {
         self.physicsWorld.contactDelegate = self
         self.basket = self.childNode(withName: "basket") as? SKSpriteNode
         self.egg1 = self.childNode(withName: "egg1") as? SKSpriteNode
         self.basketPosY = self.basket.position.y
-        self.currentScore = self.childNode(withName: "scoreLabel") as? SKLabelNode
+        self.ScoreLabel = self.childNode(withName: "scoreLabel") as? SKLabelNode
         
         self.basket.physicsBody = SKPhysicsBody(circleOfRadius: self.basket.size.width/2)
         self.basket.physicsBody?.affectedByGravity = false
         self.basket.physicsBody?.isDynamic = false
-        self.basket.physicsBody?.collisionBitMask = 0
         self.basket.physicsBody?.categoryBitMask = 0b1
         self.basket.physicsBody?.contactTestBitMask = 0b10
+        
+        
         
         enableGravityEggs(this: self.egg1)
       //  enableGravityEggs(this: self.egg2)
@@ -40,21 +41,26 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         this.physicsBody = SKPhysicsBody(circleOfRadius: this.size.width/2)
         this.physicsBody?.affectedByGravity = true
         this.physicsBody?.isDynamic = true
-        this.physicsBody?.collisionBitMask = 0
         this.physicsBody?.categoryBitMask = 0b10
         this.physicsBody?.contactTestBitMask = 0b1
+    }
+    func EggSpawner()
+    {
+        
     }
     func didBegin(_ contact: SKPhysicsContact) {
 
         if contact.bodyA.contactTestBitMask == 0b1
         {
-            print("1111")
+            currentScore += 1
+            self.ScoreLabel.text = "Score: \(currentScore)"
             contact.bodyA.node?.removeFromParent()
         }
         if contact.bodyB.contactTestBitMask == 0b1
         {
             currentScore += 1
-            print("2222")
+            self.ScoreLabel.text = "Score: \(currentScore)"
+
             contact.bodyB.node?.removeFromParent()
         }
     }
