@@ -18,9 +18,12 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
     var bound:SKSpriteNode!
     var basket:SKSpriteNode!
     var basketPosY:CGFloat = 0
+    var VelocityYEgg:CGFloat = -50
+    var gravityY:CGFloat = -1
     var ScoreLabel:SKLabelNode!
     override func didMove(to view: SKView) {
         self.physicsWorld.contactDelegate = self
+        self.physicsWorld.gravity = CGVector(dx: 0, dy: gravityY)
         //basket
         self.basket = self.childNode(withName: "basket") as? SKSpriteNode
         self.basketPosY = self.basket.position.y
@@ -55,7 +58,7 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         let object = SKSpriteNode(imageNamed: "egg2")
         object.size = CGSize(width:70.71,height:80)
         let randomX = CGFloat.random(in: -375+object.size.width...375-object.size.width)
-        let startPoint = CGPoint(x: randomX, y: self.size.height * 1.2)
+        let startPoint = CGPoint(x: randomX, y: self.size.height + 50)
         
         object.position = startPoint
         object.name = "egg"
@@ -64,6 +67,9 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         object.physicsBody = SKPhysicsBody(circleOfRadius: object.size.width/2)
         object.physicsBody?.affectedByGravity = true
         object.physicsBody?.isDynamic = true
+        object.physicsBody?.allowsRotation = false
+        //object.physicsBody?.velocity.dy = CGFloat.random(in: (-2000 * 1)...(-50 * 1))
+        object.physicsBody?.velocity.dy = VelocityYEgg
         object.physicsBody?.categoryBitMask = 0b10
         object.physicsBody?.contactTestBitMask = 0b1
     }
@@ -102,6 +108,13 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
             {
                 currentScore += 1
                 phys1.node?.removeFromParent()
+               // gravityY -= 0.5
+                if self.VelocityYEgg > -2000
+                {
+                    self.VelocityYEgg -= 25
+                }
+                
+                
             }
             //in case if it's bound
             else if phys2.categoryBitMask == 0b100
