@@ -22,6 +22,7 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
     var gravityY:CGFloat = -1
     var ScoreLabel:SKLabelNode!
     override func didMove(to view: SKView) {
+        self.scaleMode = .aspectFit
         self.physicsWorld.contactDelegate = self
         self.physicsWorld.gravity = CGVector(dx: 0, dy: gravityY)
         //basket
@@ -52,6 +53,24 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         let spawnEggSequence = SKAction.sequence([timer,startSpawnEggs])
         let spawnForever = SKAction.repeatForever(spawnEggSequence)
         self.run(spawnForever)
+        
+        //check walls for basket
+        let startwc = SKAction.run(CheckWalls)
+        let t = SKAction.wait(forDuration: 0.0001)
+        let wcsequence = SKAction.sequence([t,startwc])
+        let wcforever = SKAction.repeatForever(wcsequence)
+        self.run(wcforever)
+    }
+    func CheckWalls()
+    {
+        if(self.basket.position.x >= (375 - self.basket.size.width/2.4))
+        {
+            self.basket.position.x -= self.basket.size.width/2.4
+        }
+        if(self.basket.position.x <= -375 + self.basket.size.width/2.4)
+        {
+            self.basket.position.x += self.basket.size.width/2.4
+        }
     }
     func enableGravityEggs()
     {
@@ -134,7 +153,7 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
                     lives -= 1
                     self.life3.removeFromParent()
                     let gamescene = SKScene(fileNamed: "GameOverScene") as? GameOverScene
-                    gamescene?.scaleMode = .aspectFill
+                    gamescene?.scaleMode = .aspectFit
                     gamescene?.myscore = currentScore
                     view?.presentScene(gamescene)
                 }
@@ -147,7 +166,10 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
     func touchDown(atPoint pos : CGPoint) {
     
         if let basket = self.basket{
-            basket.run(SKAction.move(to: CGPoint(x: pos.x, y: basketPosY) , duration: 0.1))
+                basket.run(SKAction.move(to: CGPoint(x: pos.x, y: basketPosY) , duration: 0.1))
+           
+            
+            
         }
         
     
@@ -155,14 +177,14 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
     
     func touchMoved(toPoint pos : CGPoint) {
         if let basket = self.basket{
-            basket.run(SKAction.move(to: CGPoint(x: pos.x, y: basketPosY) , duration: 0.1))
+                basket.run(SKAction.move(to: CGPoint(x: pos.x, y: basketPosY) , duration: 0.1))
         }
     
     }
     
     func touchUp(atPoint pos : CGPoint) {
         if let basket = self.basket{
-            basket.run(SKAction.move(to: CGPoint(x: pos.x, y: basketPosY) , duration: 0.1))
+                basket.run(SKAction.move(to: CGPoint(x: pos.x, y: basketPosY) , duration: 0.1))
         }
     }
     

@@ -39,7 +39,7 @@ class GameOverScene:SKScene
             if nodes.contains(where: {n in return n.name == resumeB.name})
             {
                 let gamescene = SKScene(fileNamed: "GameScene")
-                gamescene?.scaleMode = .aspectFill
+                gamescene?.scaleMode = .aspectFit
                 view?.presentScene(gamescene)
                 
         
