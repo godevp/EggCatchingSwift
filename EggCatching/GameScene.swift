@@ -27,7 +27,6 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         self.basket.physicsBody = SKPhysicsBody(circleOfRadius: self.basket.size.width/2)
         self.basket.physicsBody?.affectedByGravity = false
         self.basket.physicsBody?.isDynamic = false
-        self.basket.physicsBody?.collisionBitMask = 1
         self.basket.physicsBody?.categoryBitMask = 0b1
         self.basket.physicsBody?.contactTestBitMask = 0b10
         //score label
@@ -41,14 +40,10 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         self.bound.physicsBody = SKPhysicsBody(rectangleOf: self.bound.size)
         self.bound.physicsBody?.affectedByGravity = false
         self.bound.physicsBody?.isDynamic = false
-        self.bound.physicsBody?.categoryBitMask = 0b1
-        self.bound.physicsBody?.collisionBitMask = 0
+        self.bound.physicsBody?.categoryBitMask = 0b100
         self.bound.physicsBody?.contactTestBitMask = 0b10
         
-      
-        
-        
-       
+        //eggs spawner
         let startSpawnEggs = SKAction.run(enableGravityEggs)
         let timer = SKAction.wait(forDuration: 0.6)
         let spawnEggSequence = SKAction.sequence([timer,startSpawnEggs])
@@ -57,15 +52,11 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
     }
     func enableGravityEggs()
     {
-        
         let object = SKSpriteNode(imageNamed: "egg2")
         object.size = CGSize(width:70.71,height:80)
-        
         let randomX = CGFloat.random(in: -375+object.size.width...375-object.size.width)
-        
         let startPoint = CGPoint(x: randomX, y: self.size.height * 1.2)
         
-         
         object.position = startPoint
         object.name = "egg"
         addChild(object)
@@ -73,29 +64,70 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
         object.physicsBody = SKPhysicsBody(circleOfRadius: object.size.width/2)
         object.physicsBody?.affectedByGravity = true
         object.physicsBody?.isDynamic = true
-        object.physicsBody?.categoryBitMask = 0b10 || 0b1000
+        object.physicsBody?.categoryBitMask = 0b10
         object.physicsBody?.contactTestBitMask = 0b1
     }
   
     func didBegin(_ contact: SKPhysicsContact) {
 
-        if contact.bodyA.contactTestBitMask == 0b1
-        {
-            currentScore += 1
-            self.ScoreLabel.text = "Score: \(currentScore)"
+        var phys1:SKPhysicsBody!
+        var phys2:SKPhysicsBody!
+                
+               
+        if contact.bodyA.categoryBitMask == 0b10
+            {
+                phys1 = contact.bodyA
+                phys2 = contact.bodyB
+                    
+            }
+            else if contact.bodyB.categoryBitMask == 0b10
+            {
             
-            contact.bodyA.node?.removeFromParent()
-        }
-        if contact.bodyB.contactTestBitMask == 0b1
-        {
-            
-            currentScore += 1
-            
-            self.ScoreLabel.text = "Score: \(currentScore)"
-
-            contact.bodyB.node?.removeFromParent()
-        }
-       
+                phys1 = contact.bodyB
+                phys2 = contact.bodyA
+                    
+            }
+            else if contact.bodyA.categoryBitMask == 0b100
+            {
+                phys1 = contact.bodyB
+                phys2 = contact.bodyA
+            }
+            else if contact.bodyB.categoryBitMask == 0b100
+            {
+                phys1 = contact.bodyA
+                phys2 = contact.bodyB
+            }
+           //in case if it's player
+            if phys2.categoryBitMask == 0b1
+            {
+                currentScore += 1
+                phys1.node?.removeFromParent()
+            }
+            //in case if it's bound
+            else if phys2.categoryBitMask == 0b100
+            {
+                if lives == 3
+                {
+                    lives -= 1
+                    self.life1.removeFromParent()
+                }
+                else if lives == 2
+                {
+                    lives -= 1
+                    self.life2.removeFromParent()
+                }
+                else if lives == 1
+                {
+                    lives -= 1
+                    self.life3.removeFromParent()
+                    let gamescene = SKScene(fileNamed: "GameOverScene") as? GameOverScene
+                    gamescene?.scaleMode = .aspectFill
+                    gamescene?.myscore = currentScore
+                    view?.presentScene(gamescene)
+                }
+                phys1.node?.removeFromParent()
+            }
+        self.ScoreLabel.text = "Score : \(currentScore)"
     }
     
     
@@ -124,16 +156,6 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
       
         for t in touches { self.touchDown(atPoint: t.location(in: self)) }
-//        if let t = touches.first{
-//            let nodes = self.nodes(at: t.location(in: self))
-//            if nodes.contains(where: {n in return n.name == basket.name})
-//            {
-//                let gamescene = SKScene(fileNamed: "GameOverScene")
-//                gamescene?.scaleMode = .aspectFill
-//                view?.presentScene(gamescene)
-//
-//            }
-//    }
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -150,6 +172,6 @@ class GameScene: SKScene,SKPhysicsContactDelegate {
     
     
     override func update(_ currentTime: TimeInterval) {
-        // Called before each frame is rendered
+       
     }
 }
