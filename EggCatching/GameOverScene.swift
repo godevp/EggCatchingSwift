@@ -18,14 +18,14 @@ class GameOverScene:SKScene
     private var highResultLabel:SKLabelNode!
     override func didMove(to view: SKView) {
         
-        self.highestScore = UserDefaults.standard.integer(forKey: "HScore")
+        self.highestScore = UserDefaults.standard.integer(forKey: "HScoreNew")
         self.resumeB = self.childNode(withName: "resumeB") as? SKSpriteNode
         self.resultLabel = self.childNode(withName: "score") as? SKLabelNode
         self.highResultLabel = self.childNode(withName: "highestScore") as?SKLabelNode
         if myscore > highestScore
         {
             highestScore = myscore
-            UserDefaults.standard.set(highestScore, forKey: "HScore")
+            UserDefaults.standard.set(highestScore, forKey: "HScoreNew")
         }
         resultLabel.text = "Score: \(myscore)"
         highResultLabel.text = "Highest Score: \(highestScore)"
